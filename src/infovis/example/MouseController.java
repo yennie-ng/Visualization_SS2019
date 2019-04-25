@@ -23,7 +23,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	}
 
 	public void mousePressed(MouseEvent e) {
-
+		System.out.println("x: " + e.getX() + ", y: " + e.getY());
 	}
 
 	public void mouseReleased(MouseEvent e) {
