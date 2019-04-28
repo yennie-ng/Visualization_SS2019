@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": "infovis.example.Example"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Diagram",
+            "request": "launch",
+            "mainClass": "infovis.diagram.Diagram"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Example",
+            "request": "launch",
+            "mainClass": "infovis.example.Example"
+        }
+    ]
+}
