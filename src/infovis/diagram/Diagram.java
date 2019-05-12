@@ -2,7 +2,6 @@ package infovis.diagram;
 
 import infovis.gui.GUI;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**

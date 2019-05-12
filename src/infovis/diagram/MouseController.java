@@ -173,13 +173,11 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int x = e.getX();
 		int y = e.getY();
 		double scale = view.getScale();
-		/*
-		 * Aufgabe 1.2
-		 */
+		//TODO: 1.2
+		
 		if (fisheyeMode) {
-			/*
-			 * handle fisheye mode interactions
-			 */
+			//TODO: 4.1
+			
 			view.repaint();
 		} else if (edgeDrawMode) {
 			drawingEdge.setX(e.getX());
