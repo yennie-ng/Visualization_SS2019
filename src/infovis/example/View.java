@@ -23,7 +23,7 @@ public class View extends JPanel {
         
         
         Rectangle2D rect = new Rectangle2D.Double(50, 50, 300, 100);
-		g2D.translate(-50, -50);
+		// g2D.translate(-50, -50);
 		g2D.setColor(Color.RED);
 		g2D.fill(rect);
 		g2D.scale(2, 2);

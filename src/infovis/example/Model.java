@@ -17,5 +17,4 @@ public class Model {
 	public Iterator<Shape> getIterator(){
 		return list.iterator();
 	}
-
 }

@@ -1,7 +1,9 @@
 package infovis.diagram;
 
 import infovis.diagram.elements.Element;
+import infovis.diagram.elements.Vertex;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,6 +14,7 @@ import java.util.Iterator;
 import javax.swing.JPanel;
 
 public class View extends JPanel {
+	private static final long serialVersionUID = 1L;
 	private Model model = null;
 	private Color color = Color.BLUE;
 	private double scale = 1;
@@ -19,8 +22,7 @@ public class View extends JPanel {
 	private double translateY = 0;
 	private Rectangle2D marker = new Rectangle2D.Double();
 	private Rectangle2D overviewRect = new Rectangle2D.Double();
-	private int windowWidth = this.getSize().width;
-	private int windowHeight = this.getSize().height;
+	private final double OverviewScaleValue = 3.5; 
 
 	public Model getModel() {
 		return model;
@@ -43,15 +45,48 @@ public class View extends JPanel {
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.clearRect(0, 0, getWidth(), getHeight());
-		//TODO: implementation
-		paintDiagram(g2D);
-
+		paintDiagram(model, g2D);
+		paintOverview(g2D);
 	}
 
-	private void paintDiagram(Graphics2D g2D) {
+
+	private void paintDiagram(Model model, Graphics2D g2D) {
 		for (Element element : model.getElements()) {
 			element.paint(g2D);
 		}
+	}
+
+	private void paintOverview(Graphics2D g2D) {
+		g2D.scale(1, 1);
+		g2D.setStroke(new BasicStroke(1));
+		double w = getWidth() / OverviewScaleValue;
+		double h = getHeight() / OverviewScaleValue;
+		double x = getWidth() - w - 5;
+		double y = 5;
+		this.overviewRect = new Rectangle2D.Double(x, y, w, h);
+		g2D.draw(this.overviewRect);
+		g2D.setPaint(Color.WHITE);
+		g2D.fill(this.overviewRect);
+
+		g2D.translate(x, y);
+		paintDiagram(scaleModel(model, OverviewScaleValue * this.scale), g2D);
+		g2D.translate(-x, -y);
+	}
+
+	private Model scaleModel(Model model, double scaleValue) {
+		Model newModel = new Model();
+		for (Element element: model.getElements()) {
+			try { 
+				Vertex vertex = (Vertex) element;
+
+				Vertex newElement = new Vertex(vertex.getX() / scaleValue, 
+												vertex.getY() / scaleValue, 
+												vertex.getWidth() / scaleValue, 
+												vertex.getHeight() / scaleValue);
+				newModel.addElement((Element) newElement);
+			} catch (Exception e) {}
+		}
+		return newModel;
 	}
 
 	public void setScale(double scale) {
