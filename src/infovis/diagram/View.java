@@ -63,7 +63,7 @@ public class View extends JPanel {
 
 	private void paintOverview(Graphics2D g2D) {
 		g2D.scale(1, 1);
-		g2D.setStroke(new BasicStroke(1));
+		g2D.setStroke(new BasicStroke((float)(1 / scale)));
 		
 		double w = getWidth() / OverviewScaleValue / scale;
 		double h = getHeight() / OverviewScaleValue / scale;

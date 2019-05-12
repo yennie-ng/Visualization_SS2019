@@ -2,6 +2,7 @@ package infovis.diagram;
 
 import infovis.gui.GUI;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
@@ -50,7 +51,7 @@ public class Diagram {
 				application.showToolbar(true);
 				application.setView(new Diagram().getView());
 				application.getJFrame().setVisible(true);
-				// application.getJFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);	// full screen
+				application.getJFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);	// full screen
 			}
 		});
 	}
