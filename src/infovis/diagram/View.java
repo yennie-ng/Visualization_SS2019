@@ -45,10 +45,15 @@ public class View extends JPanel {
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.clearRect(0, 0, getWidth(), getHeight());
-		paintDiagram(model, g2D);
+		paintDiagram(model, g2D, this.scale);
 		paintOverview(g2D);
 	}
 
+	private void paintDiagram(Model model, Graphics2D g2D, double scaling) {
+		g2D.scale(scaling, scaling);
+		g2D.translate(-this.translateX, -this.translateY);
+		paintDiagram(model, g2D);
+	}
 
 	private void paintDiagram(Model model, Graphics2D g2D) {
 		for (Element element : model.getElements()) {
@@ -60,9 +65,9 @@ public class View extends JPanel {
 		g2D.scale(1, 1);
 		g2D.setStroke(new BasicStroke(1));
 		
-		double w = getWidth() / OverviewScaleValue;
-		double h = getHeight() / OverviewScaleValue;
-		double x = getWidth() - w - 5;
+		double w = getWidth() / OverviewScaleValue / scale;
+		double h = getHeight() / OverviewScaleValue / scale;
+		double x = getWidth() / scale - w - 5;
 		double y = 5;
 		this.overviewRect = new Rectangle2D.Double(x, y, w, h);
 

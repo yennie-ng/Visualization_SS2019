@@ -174,7 +174,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int y = e.getY();
 		double scale = view.getScale();
 		//TODO: 1.2
-		
+		view.getScale();
 		if (fisheyeMode) {
 			//TODO: 4.1
 			
