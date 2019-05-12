@@ -35,15 +35,15 @@ public class Model {
 		elements.addAll(list);
 	}
 
-	public Iterator iterator() {
+	public Iterator<Element> iterator() {
 		return elements.iterator();
 	}
 
-	public Iterator iteratorVertices() {
+	public Iterator<Vertex> iteratorVertices() {
 		return vertices.iterator();
 	}
 
-	public Iterator iteratorEdges() {
+	public Iterator<Edge> iteratorEdges() {
 		return edges.iterator();
 	}
 

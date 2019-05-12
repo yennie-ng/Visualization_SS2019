@@ -144,7 +144,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 				groupVertex.setGroupedElements(groupedElements);
 				model.addVertex(groupVertex);
 
-				List<Edge> newEdges = new ArrayList();
+				List<Edge> newEdges = new ArrayList<Edge>();
 				for (Iterator<Edge> iter = model.iteratorEdges(); iter.hasNext();) {
 					Edge edge = iter.next();
 					if (groupRectangle.contains(edge.getSource().getShape().getBounds2D())
