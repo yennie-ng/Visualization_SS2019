@@ -72,13 +72,27 @@ public class View extends JPanel {
 
 		g2D.translate(x, y);	// translate to coordinate system of overview rectangle to draw small diagram
 		paintDiagram(scaledModel(model, 
-								OverviewScaleValue * this.scale), 
-								g2D);
+								OverviewScaleValue * this.scale, 
+								overviewRect), g2D);
 		g2D.translate(-x, -y);	// translate back to root coordinate system
 		makeMarker(g2D);		// draw marker window after main diagram and it scaled version are drawed
 	}
 
-	private Model scaledModel(Model model, double scaleValue) {
+	private void makeMarker(Graphics2D g2D) {
+		if (this.overviewRect != null) {
+			double difference = (translateX / scale) / OverviewScaleValue;
+			double w = this.overviewRect.getWidth() / this.scale;
+			double h = this.overviewRect.getHeight() / this.scale;
+			double x = this.overviewRect.getX() + difference;
+			double y = this.overviewRect.getY() + difference;
+			this.marker = new Rectangle2D.Double(x, y, w, h);
+
+			g2D.setColor(Color.RED);
+			g2D.draw(this.marker);
+		}
+	}
+
+	private Model scaledModel(Model model, double scaleValue, Rectangle2D frame) {
 		Model newModel = new Model();
 		for (Element element: model.getElements()) {
 			try { 
@@ -87,15 +101,15 @@ public class View extends JPanel {
 												vertex.getY() / scaleValue, 
 												vertex.getWidth() / scaleValue, 
 												vertex.getHeight() / scaleValue);
-				newModel.addElement((Element) newElement);
+				// if the element doesn't completely stay inside the current overview frame, won't add
+				if (newElement.getX() + newElement.getWidth() < frame.getWidth() && 
+					newElement.getY() + newElement.getHeight() < frame.getHeight())
+					newModel.addElement((Element) newElement);
 			} catch (Exception e) {}
 		}
 		return newModel;
 	}
 
-	private void makeMarker(Graphics2D g2D) {
-		
-	}
 
 	public void setScale(double scale) {
 		this.scale = scale;
