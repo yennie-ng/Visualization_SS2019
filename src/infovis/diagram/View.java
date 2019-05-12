@@ -59,26 +59,30 @@ public class View extends JPanel {
 	private void paintOverview(Graphics2D g2D) {
 		g2D.scale(1, 1);
 		g2D.setStroke(new BasicStroke(1));
+		
 		double w = getWidth() / OverviewScaleValue;
 		double h = getHeight() / OverviewScaleValue;
 		double x = getWidth() - w - 5;
 		double y = 5;
 		this.overviewRect = new Rectangle2D.Double(x, y, w, h);
+
 		g2D.draw(this.overviewRect);
 		g2D.setPaint(Color.WHITE);
 		g2D.fill(this.overviewRect);
 
-		g2D.translate(x, y);
-		paintDiagram(scaleModel(model, OverviewScaleValue * this.scale), g2D);
-		g2D.translate(-x, -y);
+		g2D.translate(x, y);	// translate to coordinate system of overview rectangle to draw small diagram
+		paintDiagram(scaledModel(model, 
+								OverviewScaleValue * this.scale), 
+								g2D);
+		g2D.translate(-x, -y);	// translate back to root coordinate system
+		makeMarker(g2D);		// draw marker window after main diagram and it scaled version are drawed
 	}
 
-	private Model scaleModel(Model model, double scaleValue) {
+	private Model scaledModel(Model model, double scaleValue) {
 		Model newModel = new Model();
 		for (Element element: model.getElements()) {
 			try { 
 				Vertex vertex = (Vertex) element;
-
 				Vertex newElement = new Vertex(vertex.getX() / scaleValue, 
 												vertex.getY() / scaleValue, 
 												vertex.getWidth() / scaleValue, 
@@ -87,6 +91,10 @@ public class View extends JPanel {
 			} catch (Exception e) {}
 		}
 		return newModel;
+	}
+
+	private void makeMarker(Graphics2D g2D) {
+		
 	}
 
 	public void setScale(double scale) {
