@@ -71,9 +71,9 @@ public class View extends JPanel {
 		double y = 5;
 		this.overviewRect = new Rectangle2D.Double(x, y, w, h);
 
-		g2D.draw(this.overviewRect);
+		g2D.draw(overviewRect);
 		g2D.setPaint(Color.WHITE);
-		g2D.fill(this.overviewRect);
+		g2D.fill(overviewRect);
 
 		g2D.translate(x, y);	// translate to coordinate system of overview rectangle to draw small diagram
 		paintDiagram(scaledModel(model, 
@@ -84,16 +84,16 @@ public class View extends JPanel {
 	}
 
 	private void makeMarker(Graphics2D g2D) {
-		if (this.overviewRect != null) {
+		if (overviewRect != null) {
 			double difference = (translateX / scale) / OverviewScaleValue;
-			double w = this.overviewRect.getWidth() / this.scale;
-			double h = this.overviewRect.getHeight() / this.scale;
-			double x = this.overviewRect.getX() + difference;
-			double y = this.overviewRect.getY() + difference;
-			this.marker = new Rectangle2D.Double(x, y, w, h);
+			double w = overviewRect.getWidth() / this.scale;
+			double h = overviewRect.getHeight() / this.scale;
+			double x = overviewRect.getX() + difference;
+			double y = overviewRect.getY() + difference;
+			marker = new Rectangle2D.Double(x, y, w, h);
 
 			g2D.setColor(Color.RED);
-			g2D.draw(this.marker);
+			g2D.draw(marker);
 		}
 	}
 
@@ -151,6 +151,10 @@ public class View extends JPanel {
 
 	public Rectangle2D getMarker() {
 		return marker;
+	}
+
+	public Rectangle2D getOverview() {
+		return overviewRect;
 	}
 
 	public boolean markerContains(int x, int y) {

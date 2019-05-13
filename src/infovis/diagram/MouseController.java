@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,10 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	private DrawingEdge drawingEdge = null;
 	private boolean fisheyeMode;
 	private GroupingRectangle groupRectangle;
+	private boolean selectingMarker = false;
+	private boolean selectingOverviewTopBorder = false;
+	private Double mouseCurrentX = null;
+	private Double mouseCurrentY = null;
 
 	/*
 	 * Getter And Setter
@@ -114,7 +119,17 @@ public class MouseController implements MouseListener, MouseMotionListener {
 			mouseOffsetX = x - selectedElement.getX() * scale;
 			mouseOffsetY = y - selectedElement.getY() * scale;
 		}
+	}
 
+	private boolean isInRect(Rectangle2D rect, double scale, int currentX, int currentY) {
+		double x = (rect.getX() - view.getTranslateX()) * scale;
+		double y = (rect.getY() - view.getTranslateY()) * scale;
+		double w = rect.getWidth() * scale;
+		double h = rect.getHeight() * scale;
+		return currentX >= x 
+			&& currentX <= x + w * scale 
+			&& currentY >= y 
+			&& currentY <= y + h * scale; 
 	}
 
 	public void mouseReleased(MouseEvent arg0) {
@@ -174,7 +189,6 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int y = e.getY();
 		double scale = view.getScale();
 		//TODO: 1.2
-		view.getScale();
 		if (fisheyeMode) {
 			//TODO: 4.1
 			

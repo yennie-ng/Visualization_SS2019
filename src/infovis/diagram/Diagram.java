@@ -38,7 +38,7 @@ public class Diagram {
 
 		controller.setModel(model);
 		controller.setView(view);
-		
+
 		menuController.setView(view);
 		menuController.setModel(model);
 		menuController.setMouseControllerAddedToView(controller);
