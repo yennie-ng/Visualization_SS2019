@@ -22,7 +22,11 @@ public class View extends JPanel {
 	private double translateY = 0;
 	private Rectangle2D marker = new Rectangle2D.Double();
 	private Rectangle2D overviewRect = new Rectangle2D.Double();
-	private final double OverviewScaleValue = 3.5; 
+	public final double overviewScaleValue = 3.5; 
+	private double maxTransX = -1;
+	private double maxTransY = -1;
+	private double overViewTransX = 0;
+	private double overViewTransY = 0;
 
 	public Model getModel() {
 		return model;
@@ -65,10 +69,10 @@ public class View extends JPanel {
 		g2D.scale(1, 1);
 		g2D.setStroke(new BasicStroke((float)(1 / scale)));
 		
-		double w = getWidth() / OverviewScaleValue / scale;
-		double h = getHeight() / OverviewScaleValue / scale;
-		double x = getWidth() / scale - w - 5;
-		double y = 5;
+		double w = getWidth() / overviewScaleValue / scale;
+		double h = getHeight() / overviewScaleValue / scale;
+		double x = getWidth() / scale - w + translateX + overViewTransX;
+		double y = translateY + overViewTransY;
 		this.overviewRect = new Rectangle2D.Double(x, y, w, h);
 
 		g2D.draw(overviewRect);
@@ -77,7 +81,7 @@ public class View extends JPanel {
 
 		g2D.translate(x, y);	// translate to coordinate system of overview rectangle to draw small diagram
 		paintDiagram(scaledModel(model, 
-								OverviewScaleValue * this.scale, 
+								overviewScaleValue * this.scale, 
 								overviewRect), g2D);
 		g2D.translate(-x, -y);	// translate back to root coordinate system
 		makeMarker(g2D);		// draw marker window after main diagram and it scaled version are drawed
@@ -85,15 +89,20 @@ public class View extends JPanel {
 
 	private void makeMarker(Graphics2D g2D) {
 		if (overviewRect != null) {
-			double difference = (translateX / scale) / OverviewScaleValue;
+			double differenceX = (translateX / scale) / overviewScaleValue;
+			double differenceY = (translateY / scale) / overviewScaleValue;
 			double w = overviewRect.getWidth() / this.scale;
 			double h = overviewRect.getHeight() / this.scale;
-			double x = overviewRect.getX() + difference;
-			double y = overviewRect.getY() + difference;
+			double x = overviewRect.getX() + differenceX;
+			double y = overviewRect.getY() + differenceY;
 			marker = new Rectangle2D.Double(x, y, w, h);
 
 			g2D.setColor(Color.RED);
 			g2D.draw(marker);
+
+			// max translate x and y for avoid the maker jump out the overview
+			maxTransX = (overviewRect.getWidth() - marker.getWidth()) * scale * overviewScaleValue;
+			maxTransY = (overviewRect.getHeight() - marker.getHeight()) * scale * overviewScaleValue;
 		}
 	}
 
@@ -141,6 +150,17 @@ public class View extends JPanel {
 	}
 
 	public void updateTranslation(double x, double y) {
+		if (x > maxTransX) {
+			x = maxTransX;
+		} else if (x < 0) {
+			x = 0;
+		}
+
+		if (y > maxTransY) {
+			y = maxTransY;
+		} else if (y < 0) {
+			y = 0;
+		}
 		setTranslateX(x);
 		setTranslateY(y);
 	}

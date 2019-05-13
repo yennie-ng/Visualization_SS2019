@@ -30,8 +30,8 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	private GroupingRectangle groupRectangle;
 	private boolean selectingMarker = false;
 	private boolean selectingOverviewTopBorder = false;
-	private Double mouseCurrentX = null;
-	private Double mouseCurrentY = null;
+	private double currentX = 0;
+	private double currentY = 0;
 
 	/*
 	 * Getter And Setter
@@ -87,7 +87,6 @@ public class MouseController implements MouseListener, MouseMotionListener {
 			}
 			model.removeEdges(edgesToRemove);
 			model.removeElement(groupVertex);
-
 		}
 	}
 
@@ -103,21 +102,26 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		double scale = view.getScale();
 
 		if (edgeDrawMode) {
-			drawingEdge = new DrawingEdge((Vertex) getElementContainingPosition(x / scale, y / scale));
-			model.addElement(drawingEdge);
-		} else if (fisheyeMode) {
-			/*
-			 * do handle interactions in fisheye mode
-			 */
-			view.repaint();
+			if (drawingEdge != null) {
+				drawingEdge = new DrawingEdge((Vertex) getElementContainingPosition(x / scale, y / scale));
+				model.addElement(drawingEdge);
+			}
 		} else {
-
-			selectedElement = getElementContainingPosition(x / scale, y / scale);
-			/*
-			 * calculate offset
-			 */
-			mouseOffsetX = x - selectedElement.getX() * scale;
-			mouseOffsetY = y - selectedElement.getY() * scale;
+			selectingMarker = isInRect(view.getMarker(), scale, x, y);
+			//TODO: selectingOverviewTopBorder = ...;
+			if (selectingMarker) {
+				currentX = x;
+				currentY = y;
+			} else {
+				selectedElement = getElementContainingPosition(x / scale, y / scale);
+				/*
+				 * calculate offset
+				 */
+				mouseOffsetX = x - selectedElement.getX() * scale;
+				mouseOffsetY = y - selectedElement.getY() * scale;
+				currentX = 0;
+				currentY = 0;
+			}
 		}
 	}
 
@@ -126,13 +130,12 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		double y = (rect.getY() - view.getTranslateY()) * scale;
 		double w = rect.getWidth() * scale;
 		double h = rect.getHeight() * scale;
-		return currentX >= x 
-			&& currentX <= x + w * scale 
-			&& currentY >= y 
-			&& currentY <= y + h * scale; 
+		return currentX >= x && currentX <= x + w * scale && currentY >= y && currentY <= y + h * scale;
 	}
 
 	public void mouseReleased(MouseEvent arg0) {
+		selectingMarker = false;
+		selectingOverviewTopBorder = false;
 		int x = arg0.getX();
 		int y = arg0.getY();
 
@@ -188,10 +191,19 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int x = e.getX();
 		int y = e.getY();
 		double scale = view.getScale();
-		//TODO: 1.2
+		if (selectingMarker) {
+			double overviewScale = view.overviewScaleValue;
+			double transX = (x - currentX) * overviewScale + view.getTranslateX();
+			double transY = (y - currentY) * overviewScale + view.getTranslateY();
+			view.updateTranslation(transX, transY);
+			//TODO: updateFisheyeFocus(...);
+			mouseMoved(e);
+		}
+		currentX = x;
+		currentY = y;
 		if (fisheyeMode) {
-			//TODO: 4.1
-			
+			// TODO: 4.1
+
 			view.repaint();
 		} else if (edgeDrawMode) {
 			drawingEdge.setX(e.getX());
@@ -203,6 +215,9 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	}
 
 	public void mouseMoved(MouseEvent e) {
+		if (fisheyeMode) {
+			//TODO: 4.1
+		}
 	}
 
 	public boolean isDrawingEdges() {
