@@ -197,13 +197,13 @@ public class MouseController implements MouseListener, MouseMotionListener {
 			double transY = (y - currentY) * overviewScale + view.getTranslateY();
 			view.updateTranslation(transX, transY);
 			//TODO: updateFisheyeFocus(...);
-			mouseMoved(e);
+			//mouseMoved(e);
 		}
 		currentX = x;
 		currentY = y;
 		if (fisheyeMode) {
 			// TODO: 4.1
-
+			
 			view.repaint();
 		} else if (edgeDrawMode) {
 			drawingEdge.setX(e.getX());
