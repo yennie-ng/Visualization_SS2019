@@ -107,8 +107,8 @@ public class MouseController implements MouseListener, MouseMotionListener {
 				model.addElement(drawingEdge);
 			}
 		} else {
-			selectingMarker = isInRect(view.getMarker(), scale, x, y);
-			selectingOverviewTop = isInRect(view.getOverviewTop(), scale, x, y);
+			selectingMarker = isInsideRect(view.getMarker(), scale, x, y);
+			selectingOverviewTop = isInsideRect(view.getOverviewTop(), scale, x, y);
 			if (selectingMarker || selectingOverviewTop) {
 				currentX = x;
 				currentY = y;
@@ -125,7 +125,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		}
 	}
 
-	private boolean isInRect(Rectangle2D rect, double scale, int currentX, int currentY) {
+	private boolean isInsideRect(Rectangle2D rect, double scale, int currentX, int currentY) {
 		double x = (rect.getX() - view.getTranslateX()) * scale;
 		double y = (rect.getY() - view.getTranslateY()) * scale;
 		double w = rect.getWidth() * scale;
@@ -197,6 +197,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 				double transX = (x - currentX) * overviewScale + view.getTranslateX();
 				double transY = (y - currentY) * overviewScale + view.getTranslateY();
 				view.updateTranslation(transX, transY);
+				this.updateFisheyeFocus(scale);
 				mouseMoved(e);
 			} else {
 				double transX = (x - currentX) / scale + view.getOverviewTranslateX();
@@ -204,13 +205,8 @@ public class MouseController implements MouseListener, MouseMotionListener {
 				view.setOverviewTranslateX(transX);
 				view.setOverviewTranslateY(transY);
 			}
-		}
-		currentX = x;
-		currentY = y;
-		if (fisheyeMode) {
-			// TODO: 4.1
-			
-			view.repaint();
+			currentX = x;
+			currentY = y;
 		} else if (edgeDrawMode) {
 			drawingEdge.setX(e.getX());
 			drawingEdge.setY(e.getY());
@@ -222,7 +218,11 @@ public class MouseController implements MouseListener, MouseMotionListener {
 
 	public void mouseMoved(MouseEvent e) {
 		if (fisheyeMode) {
-			//TODO: 4.1
+			double scale = view.getScale();
+			view.setFocusX(e.getX() / scale + view.getTranslateX());
+			view.setFocusY(e.getY() / scale + view.getTranslateY());
+			this.setFisheyeModel();
+			view.repaint();
 		}
 	}
 
@@ -238,15 +238,30 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		fisheyeMode = b;
 		if (b) {
 			Debug.p("new Fisheye Layout");
-			/*
-			 * handle fish eye initial call
-			 */
+			double scale = view.getScale();
+			view.setFocusX(view.getWidth() / 2 / scale);
+			view.setFocusY(view.getHeight() / 2 / scale);
+			this.setFisheyeModel();
 			view.repaint();
 		} else {
 			Debug.p("new Normal Layout");
 			view.setModel(model);
 			view.repaint();
 		}
+	}
+
+	private void updateFisheyeFocus(double scale) {
+		if (fisheyeMode) {
+			view.setFocusX(view.getFocusX() * view.getScale() / scale);
+			view.setFocusY(view.getFocusY() * view.getScale() / scale);
+			this.setFisheyeModel();
+		}
+	}
+
+	private void setFisheyeModel() {
+		Fisheye fisheye = new Fisheye();
+		Model fisheyeModel = fisheye.transform(model, view);
+		view.setModel(fisheyeModel);
 	}
 
 	/*
