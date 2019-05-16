@@ -27,6 +27,8 @@ public class View extends JPanel {
 	private double maxTransY = -1;
 	private double overViewTransX = 0;
 	private double overViewTransY = 0;
+	private double focusX = 0;
+	private double focusY = 0;
 
 	public Model getModel() {
 		return model;
@@ -171,6 +173,22 @@ public class View extends JPanel {
 
 	public void setOverviewTranslateY(double y) {
 		this.overViewTransY = y;
+	}
+
+	public double getFocusX() {
+		return this.focusX;
+	}
+
+	public void setFocusX(double x) {
+		this.focusX = x;
+	}
+
+	public double getFocusY() {
+		return this.focusY;
+	}
+
+	public void setFocusY(double y) {
+		this.focusY = y;
 	}
 
 	public void updateTranslation(double x, double y) {
