@@ -8,10 +8,11 @@ import javax.swing.SwingUtilities;
 public class Scatterplot {
 	private View view;
 	private Model model;
-	private MouseController controller ;
-	
-	public JPanel getView(){
-		if (view == null) generateScatterplot();
+	private MouseController controller;
+
+	public JPanel getView() {
+		if (view == null)
+			generateScatterplot();
 		return view;
 	}
 
@@ -25,7 +26,7 @@ public class Scatterplot {
 		view.addMouseListener(controller);
 		view.addMouseMotionListener(controller);
 	}
-	
+
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
