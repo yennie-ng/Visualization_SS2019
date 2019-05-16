@@ -9,7 +9,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
 
 import javax.swing.JPanel;
 
@@ -20,8 +19,9 @@ public class View extends JPanel {
 	private double scale = 1;
 	private double translateX = 0;
 	private double translateY = 0;
-	private Rectangle2D marker = new Rectangle2D.Double();
-	private Rectangle2D overviewRect = new Rectangle2D.Double();
+	private Rectangle2D marker;
+	private Rectangle2D overviewRect;
+	private Rectangle2D overViewTop;
 	public final double overviewScaleValue = 3.5; 
 	private double maxTransX = -1;
 	private double maxTransY = -1;
@@ -67,12 +67,20 @@ public class View extends JPanel {
 
 	private void paintOverview(Graphics2D g2D) {
 		g2D.scale(1, 1);
-		g2D.setStroke(new BasicStroke((float)(1 / scale)));
+		g2D.setStroke(new BasicStroke((float)(1 / scale)));			// scale the thic of the border
+
+		double topY = translateY + overViewTransY;
+		double topHeight = 7 / scale;
 		
 		double w = getWidth() / overviewScaleValue / scale;
 		double h = getHeight() / overviewScaleValue / scale;
 		double x = getWidth() / scale - w + translateX + overViewTransX;
-		double y = translateY + overViewTransY;
+		double y = topY + topHeight;
+
+		this.overViewTop = new Rectangle2D.Double(x, topY, w, topHeight);
+		g2D.draw(overViewTop);
+		g2D.fill(overViewTop);
+
 		this.overviewRect = new Rectangle2D.Double(x, y, w, h);
 
 		g2D.draw(overviewRect);
@@ -149,6 +157,22 @@ public class View extends JPanel {
 		this.translateY = tansslateY;
 	}
 
+	public double getOverviewTranslateX() {
+		return this.overViewTransX;
+	}
+
+	public void setOverviewTranslateX(double x) {
+		this.overViewTransX = x;
+	}
+
+	public double getOverviewTranslateY (){
+		return this.overViewTransY;
+	}
+
+	public void setOverviewTranslateY(double y) {
+		this.overViewTransY = y;
+	}
+
 	public void updateTranslation(double x, double y) {
 		if (x > maxTransX) {
 			x = maxTransX;
@@ -175,6 +199,10 @@ public class View extends JPanel {
 
 	public Rectangle2D getOverview() {
 		return overviewRect;
+	}
+
+	public Rectangle2D getOverviewTop() {
+		return overViewTop;
 	}
 
 	public boolean markerContains(int x, int y) {

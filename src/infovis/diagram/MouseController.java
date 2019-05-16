@@ -29,7 +29,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	private boolean fisheyeMode;
 	private GroupingRectangle groupRectangle;
 	private boolean selectingMarker = false;
-	private boolean selectingOverviewTopBorder = false;
+	private boolean selectingOverviewTop = false;
 	private double currentX = 0;
 	private double currentY = 0;
 
@@ -108,8 +108,8 @@ public class MouseController implements MouseListener, MouseMotionListener {
 			}
 		} else {
 			selectingMarker = isInRect(view.getMarker(), scale, x, y);
-			//TODO: selectingOverviewTopBorder = ...;
-			if (selectingMarker) {
+			selectingOverviewTop = isInRect(view.getOverviewTop(), scale, x, y);
+			if (selectingMarker || selectingOverviewTop) {
 				currentX = x;
 				currentY = y;
 			} else {
@@ -135,7 +135,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 
 	public void mouseReleased(MouseEvent arg0) {
 		selectingMarker = false;
-		selectingOverviewTopBorder = false;
+		selectingOverviewTop = false;
 		int x = arg0.getX();
 		int y = arg0.getY();
 
@@ -191,13 +191,19 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int x = e.getX();
 		int y = e.getY();
 		double scale = view.getScale();
-		if (selectingMarker) {
-			double overviewScale = view.overviewScaleValue;
-			double transX = (x - currentX) * overviewScale + view.getTranslateX();
-			double transY = (y - currentY) * overviewScale + view.getTranslateY();
-			view.updateTranslation(transX, transY);
-			//TODO: updateFisheyeFocus(...);
-			//mouseMoved(e);
+		if (selectingMarker || selectingOverviewTop) {
+			if (selectingMarker) {
+				double overviewScale = view.overviewScaleValue;
+				double transX = (x - currentX) * overviewScale + view.getTranslateX();
+				double transY = (y - currentY) * overviewScale + view.getTranslateY();
+				view.updateTranslation(transX, transY);
+				mouseMoved(e);
+			} else {
+				double transX = (x - currentX) / scale + view.getOverviewTranslateX();
+				double transY = (y - currentY) / scale + view.getOverviewTranslateY();
+				view.setOverviewTranslateX(transX);
+				view.setOverviewTranslateY(transY);
+			}
 		}
 		currentX = x;
 		currentY = y;
