@@ -15,16 +15,17 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public class View extends JPanel {
+	private static final long serialVersionUID = 7332626899583634667L;
 	private Model model = null;
-	private Rectangle2D markerRectangle = new Rectangle2D.Double(0, 0, 0, 0);
+	private Rectangle2D markerRect = new Rectangle2D.Double(0, 0, 0, 0);
 	private int cellSize = 40;
 	private int pointSize = 5;
 	private int padding = 20;
 	private ArrayList<MatrixCell> cells = new ArrayList<MatrixCell>();
 
 	// ------------------------ getter setter -----------------------------
-	public Rectangle2D getMarkerRectangle() {
-		return markerRectangle;
+	public Rectangle2D getMarkerRect() {
+		return markerRect;
 	}
 
 	public ArrayList<MatrixCell> getCells() {
@@ -47,10 +48,11 @@ public class View extends JPanel {
 		debuggingPrint();
 		this.cellSize = ((getHeight() <= getWidth() ? getHeight() : getWidth()) - 50) / model.getLabels().size();	// resize based on Frame
 		g2d.setStroke(new BasicStroke(2.f));
-		paintScatterPlot(g2d);
+		drawScatterPlot(g2d);
+		drawMarker(g2d);
 	}
 
-	private void paintScatterPlot(Graphics2D g2d) {
+	private void drawScatterPlot(Graphics2D g2d) {
 		int size = model.getLabels().size();
 		Font font = new Font("Helvetica Neue", Font.PLAIN, 10);
 		g2d.setFont(font);
@@ -134,7 +136,11 @@ public class View extends JPanel {
 			point.setHorizontal(horizontal);
 			point.setVertical(vertical);
 		}
+	}
 
+	private void drawMarker(Graphics2D g2d) {
+		g2d.setPaint(Color.RED);
+		g2d.draw(markerRect);
 	}
 
 	private void debuggingPrint() {
