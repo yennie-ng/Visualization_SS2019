@@ -5,6 +5,7 @@ import infovis.debug.Debug;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -44,7 +45,7 @@ public class View extends JPanel {
 		g2d.setBackground(Color.WHITE);
 		g2d.clearRect(0, 0, this.getWidth(), this.getHeight());
 		debuggingPrint();
-		this.cellSize = (((getHeight() >= getWidth()) ? getHeight() : getWidth()) - 50) / model.getLabels().size();
+		this.cellSize = ((getHeight() <= getWidth() ? getHeight() : getWidth()) - 50) / model.getLabels().size();	// resize based on Frame
 		g2d.setStroke(new BasicStroke(2.f));
 		paintScatterPlot(g2d);
 	}
@@ -54,15 +55,15 @@ public class View extends JPanel {
 		Font font = new Font("Helvetica Neue", Font.PLAIN, 10);
 		g2d.setFont(font);
 
-		for (int i = 0; i < size; i++) {			// ....
+		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {		// for each cell...
-				Rectangle2D rect = new Rectangle2D.Double(size * i + 5, size * j + 5, size, size);
+				Rectangle2D rect = new Rectangle2D.Double(cellSize * i + 5, cellSize * j + 5, cellSize, cellSize);
 				MatrixCell cell;
 				if (this.cells.size() < Math.pow(size, 2)) {	// create new cell to the list in the first time
 					cell = new MatrixCell(rect, j, i);
 					cells.add(cell);
 				} else {										// get from ecurrent list
-					cell = cells.get(i * size * j);
+					cell = cells.get(i * size + j);
 					cell.setRect(rect);
 				}
 
@@ -72,7 +73,10 @@ public class View extends JPanel {
 				g2d.fill(rect);
 				g2d.setPaint(Color.BLACK);
 
-				drawPlotCells(g2d, cell, i, j);
+				if (i == j)	// diagonal cell
+					drawDiagonalCell(g2d, cell, model.getLabels().get(i), font);
+				else
+					drawPlotCells(g2d, cell, i, j);
 			}
 		}
 	}
@@ -87,8 +91,8 @@ public class View extends JPanel {
 		double minHorizontal = columnRange.getMin();
 		double maxHorizontal = columnRange.getMax();
 
-		double vertivalSteps = (maxVertical - minVertical) / (cellSize / padding);
-		double horizontalSteps = (maxHorizontal - minHorizontal) / (cellSize / padding);
+		double vertivalSteps = (maxVertical - minVertical) / (cellSize - padding);
+		double horizontalSteps = (maxHorizontal - minHorizontal) / (cellSize - padding);
 		int dataSize = model.getList().size();
 
 		for (int index = 0; index < dataSize; index++) {
@@ -104,14 +108,32 @@ public class View extends JPanel {
 
 			// draw point
 			g2d.fillOval((int) Math.round(x), (int) Math.round(y), pointSize, pointSize);
-			
+			updatePointList(cell, dataSize, horizontal, vertical, x, y, index);
 		}
+	}
+
+	private void drawDiagonalCell(Graphics2D g2d, MatrixCell cell, String label, Font font) {
+		FontMetrics fontMetrics = g2d.getFontMetrics(font);
+		Rectangle2D rect = cell.getRect();
+		int x = (int) Math.round(rect.getX()) + (cellSize - fontMetrics.stringWidth(label)) / 2;
+		int y = (int) Math.round(rect.getY()) + ((cellSize - fontMetrics.getHeight()) / 2) + fontMetrics.getAscent();
+		g2d.drawString(label, x, y);
 	}
 
 	private void updatePointList(
 		MatrixCell cell, int dataSize, double horizontal, 
-		double vertical, double x, double y, double index) {
-		
+		double vertical, double x, double y, int index) {
+		if (cell.getPoints().size() < dataSize) {	// first time
+			// ad point
+			cell.getPoints().add(new PlotPoint(horizontal, vertical, x, y));
+		} else {
+			// update point
+			PlotPoint point = cell.getPoints().get(index);
+			point.setX(x);
+			point.setY(y);
+			point.setHorizontal(horizontal);
+			point.setVertical(vertical);
+		}
 
 	}
 
