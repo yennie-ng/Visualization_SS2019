@@ -6,6 +6,7 @@ public class Data {
 	private double[] values;
 	private Color color = Color.BLACK;
 	private String label = "";
+	private boolean selected = false;
 
 	public Data(double[] values, String label) {
 		super();
@@ -54,6 +55,14 @@ public class Data {
 
 	public void setColor(Color color) {
 		this.color = color;
+	}
+
+	public boolean getSelected() {
+		return this.selected;
+	}
+
+	public void getSelected(boolean selected) {
+		this.selected = selected;
 	}
 
 	public String toString() {

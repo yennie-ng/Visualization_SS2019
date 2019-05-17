@@ -77,8 +77,42 @@ public class View extends JPanel {
 		}
 	}
 
-	private void drawPlotCells(Graphics2D g2d, MatrixCell cell, int column, int row) {
+	private void drawPlotCells(Graphics2D g2d, MatrixCell cell, int columnIndex, int rowIndex) {
+		// ------------ scale the data 
+		Range rowRange = model.getRanges().get(rowIndex);
+		double minVertical = rowRange.getMin();
+		double maxVertical = rowRange.getMax();
+
+		Range columnRange = model.getRanges().get(columnIndex);
+		double minHorizontal = columnRange.getMin();
+		double maxHorizontal = columnRange.getMax();
+
+		double vertivalSteps = (maxVertical - minVertical) / (cellSize / padding);
+		double horizontalSteps = (maxHorizontal - minHorizontal) / (cellSize / padding);
+		int dataSize = model.getList().size();
+
+		for (int index = 0; index < dataSize; index++) {
+			Data data = model.getList().get(index);
+			double vertical = data.getValue(rowIndex);
+			double horizontal = data.getValue(columnIndex);
+			Rectangle2D rect = cell.getRect();
+			// set point's coordinate
+			double x = rect.getX() + 5 + (horizontal - minHorizontal) / horizontalSteps;
+			double y = rect.getY() + 5 + (vertical - minVertical) / vertivalSteps;
+
+			g2d.setColor((data.getSelected()) ? Color.RED : Color.BLACK);
+
+			// draw point
+			g2d.fillOval((int) Math.round(x), (int) Math.round(y), pointSize, pointSize);
+			
+		}
+	}
+
+	private void updatePointList(
+		MatrixCell cell, int dataSize, double horizontal, 
+		double vertical, double x, double y, double index) {
 		
+
 	}
 
 	private void debuggingPrint() {
