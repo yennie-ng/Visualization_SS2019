@@ -25,5 +25,5 @@ public class View extends JPanel {
 	public void setModel(Model model) {
 		this.model = model;
 	}
-	
+
 }
