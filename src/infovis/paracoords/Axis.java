@@ -11,7 +11,9 @@ public class Axis {
     private double step;
     private Rectangle2D rect;
 
-    public Axis(int x, int labelIndex, double min, double max, double step, Rectangle2D rect) {
+    public Axis(int x, int labelIndex, 
+                double min, double max, 
+                double step, Rectangle2D rect) {
         this.x = x;
         this.labelIndex = labelIndex;
         this.min = min;
