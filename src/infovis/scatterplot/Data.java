@@ -2,13 +2,12 @@ package infovis.scatterplot;
 
 import java.awt.Color;
 
-import com.sun.org.apache.regexp.internal.recompile;
-
-public class Data{
-	private double [] values;
+public class Data {
+	private double[] values;
 	private Color color = Color.BLACK;
 	private String label = "";
-	
+	private boolean selected = false;
+
 	public Data(double[] values, String label) {
 		super();
 		this.values = values;
@@ -22,7 +21,7 @@ public class Data{
 		this.label = label;
 	}
 
-	public Data (double[] values) {
+	public Data(double[] values) {
 		this.values = values;
 	}
 
@@ -41,20 +40,32 @@ public class Data{
 	public void setValues(double[] values) {
 		this.values = values;
 	}
-	public int getDimension(){
-		 return values.length;
+
+	public int getDimension() {
+		return values.length;
 	}
-	public double getValue(int index){
+
+	public double getValue(int index) {
 		return values[index];
 	}
+
 	public Color getColor() {
 		return color;
 	}
+
 	public void setColor(Color color) {
 		this.color = color;
 	}
-	
-	public String toString(){
+
+	public boolean getSelected() {
+		return this.selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public String toString() {
 		StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append(label);
 		stringBuffer.append('[');
@@ -62,9 +73,9 @@ public class Data{
 			stringBuffer.append(value);
 			stringBuffer.append(',');
 		}
-		
+
 		stringBuffer.append(']');
-	return stringBuffer.toString();
+		return stringBuffer.toString();
 	}
 
 }
