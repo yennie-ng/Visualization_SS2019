@@ -1,5 +1,4 @@
 package infovis.scatterplot;
-
 import infovis.debug.Debug;
 
 import java.awt.BasicStroke;
@@ -64,7 +63,7 @@ public class View extends JPanel {
 				if (this.cells.size() < Math.pow(size, 2)) {	// create new cell to the list in the first time
 					cell = new MatrixCell(rect, j, i);
 					cells.add(cell);
-				} else {										// get from ecurrent list
+				} else {										// get from current list
 					cell = cells.get(i * size + j);
 					cell.setRect(rect);
 				}

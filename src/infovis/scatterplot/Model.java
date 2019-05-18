@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.imageio.stream.FileImageInputStream;
-
 public class Model {
 	private ArrayList<Data> list = new ArrayList<Data>();
 	private ArrayList<Range> ranges = new ArrayList<Range>();
