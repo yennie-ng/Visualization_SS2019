@@ -61,7 +61,7 @@ public class Data {
 		return this.selected;
 	}
 
-	public void getSelected(boolean selected) {
+	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
 
