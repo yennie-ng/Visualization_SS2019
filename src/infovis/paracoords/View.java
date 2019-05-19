@@ -21,19 +21,30 @@ import com.sun.istack.internal.Nullable;
 public class View extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private Model model = null;
-	private Rectangle2D markerRect = new Rectangle2D.Double(0, 0, 0, 0);
+	private Rectangle2D markerRectangle = new Rectangle2D.Double(0, 0, 0, 0);
 	private int paddingX = 100;
 	private int paddingY = 50;
 	private int axisHeight = 0;
-	private final int count = 5;
-	private final int length = 5;
-	private final int padding = 5;
+	private final int countValue = 5;
+	private final int lengthValue = 5;
+	private final int paddingValue = 5;
 	private ArrayList<Axis> axisList = new ArrayList<Axis>();
 	private ArrayList<PlotLine> plotLineList = new ArrayList<PlotLine>();
-	private ArrayList<Integer> labelIndexList = new ArrayList<Integer>();
+	private ArrayList<Integer> labelIndexList = new ArrayList<>();
 
 	public Rectangle2D getMarkerRectangle() {
-		return this.markerRect;
+		return markerRectangle;
+	}
+
+	public Model getModel() {
+		return model;
+	}
+
+	public void setModel(Model model) {
+		this.model = model;
+		for (int i = 0; i < model.getDim(); i++) {
+			labelIndexList.add(i);
+		}
 	}
 
 	public ArrayList<Axis> getAxisList() {
@@ -52,31 +63,20 @@ public class View extends JPanel {
 		this.labelIndexList = labelIndexList;
 	}
 
-	public Model getModel() {
-		return model;
-	}
-
-	public void setModel(Model model) {
-		this.model = model;
-		for (int i = 0; i < model.getDim(); ++i) {
-			labelIndexList.add(i);
-		}
-	}
-
 	@Override
 	public void paint(Graphics g) {
 		plotLineList.clear();
-		Graphics2D g2d = (Graphics2D) g;
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setBackground(Color.WHITE);
-		g2d.clearRect(0, 0, this.getWidth(), this.getHeight());
+		Graphics2D g2D = (Graphics2D) g;
+		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2D.setBackground(Color.WHITE);
+		g2D.clearRect(0, 0, getWidth(), getHeight());
 		Font font = new Font("Helvetica Neue", Font.PLAIN, 12);
-		g2d.setFont(font);
-		FontMetrics fontMetric = g2d.getFontMetrics(font);
-		this.paintAxis(g2d, fontMetric);
-		this.paintData(g2d, fontMetric);
-		this.drawMarker(g2d);
-		this.updateLabelIndexs();
+		g2D.setFont(font);
+		FontMetrics metrics = g2D.getFontMetrics(font);
+		paintAxis(g2D, metrics);
+		paintData(g2D, metrics);
+		drawMarker(g2D);
+		updateLabelIndexList();
 	}
 
 	@Override
@@ -84,44 +84,44 @@ public class View extends JPanel {
 		paint(g);
 	}
 
-	private void paintAxis(Graphics2D g2d, FontMetrics fontMetric) {
-		this.axisHeight =  this.getHeight() - paddingY * 3;
-		int gap = (this.getWidth() - paddingY) / model.getDim();
+	private void paintAxis(Graphics2D g2D, FontMetrics metrics) {
+		axisHeight = getHeight() - paddingY * 3;
+		int gap = (getWidth() - paddingY) / model.getDim();
 		int axisCount = model.getLabels().size();
 
-		for (int index = 0; index < axisCount; index ++) {
+		for (int index = 0; index < axisCount; index++) {
 			int labelIndex = index;
 
 			if (axisList.size() == axisCount)
 				labelIndex = axisList.get(index).getLabelIndex();
-			
+
 			int axisX = paddingX + gap * index;
 			int originalX = axisX;
 
 			if (axisList.size() == axisCount)
 				axisX += axisList.get(index).getTranslate();
-			
-			g2d.drawLine(axisX, paddingY, axisX, paddingY + axisHeight);
-			Rectangle2D rect = drawedAxisLabel(g2d, fontMetric, labelIndex, axisX);
-			this.updateAxisList(originalX, index, labelIndex, rect);
+
+			g2D.drawLine(axisX, paddingY, axisX, paddingY + axisHeight);
+			Rectangle2D rectangle = drawedAxisLabel(g2D, metrics, labelIndex, axisX);
+			updateAxisList(originalX, index, labelIndex, rectangle);
 		}
 	}
 
-	private Rectangle2D drawedAxisLabel(Graphics2D g2d, FontMetrics fontMetric, int labelIndex, int axisX) {
-		String label = this.model.getLabels().get(labelIndex);
+	private Rectangle2D drawedAxisLabel(Graphics2D g2D, FontMetrics metrics, int labelIndex, int axisX) {
+		String label = model.getLabels().get(labelIndex);
 		// ------------------ set center
-		int width = fontMetric.stringWidth(label);
-		int x = axisX - width / 2;
+		int stringWidth = metrics.stringWidth(label);
+		int x = axisX - stringWidth / 2;
 		int y = paddingY * 2 + axisHeight;
-		g2d.setColor(Color.CYAN);
-		g2d.drawString(label, x, y);
-		g2d.setColor(Color.BLACK);
+		g2D.setColor(Color.CYAN);
+		g2D.drawString(label, x, y);
+		g2D.setColor(Color.BLACK);
 		// ------------------ label container
-		Rectangle2D rect = new Rectangle2D.Double(x - padding, 
-												y - fontMetric.getHeight(), 
-												width + padding * 2, 
-												fontMetric.getHeight() * 2);
-		g2d.draw(rect);
+		Rectangle2D rect = new Rectangle2D.Double(x - paddingValue, 
+														y - metrics.getHeight(),
+														stringWidth + paddingValue * 2, 
+														metrics.getHeight() * 2);
+		g2D.draw(rect);
 		return rect;
 	}
 
@@ -130,9 +130,8 @@ public class View extends JPanel {
 		double min = range.getMin();
 		double step = (range.getMax() - min) / axisHeight;
 		if (axisList.size() < model.getLabels().size()) {	// add axis in the first time
-			Axis newAxis = new Axis(axisX, labelIndex, min, range.getMax(), step, rect);
-			axisList.add(newAxis);
-		} else {											// update existed axis
+			axisList.add(new Axis(axisX, labelIndex, min, range.getMax(), step, rect));
+		} else {	// update existed axis
 			Axis axis = axisList.get(axisIndex);
 			axis.setX(axisX);
 			axis.setStep(step);
@@ -140,27 +139,28 @@ public class View extends JPanel {
 		}
 	}
 
-	private void paintData(Graphics2D g2d, FontMetrics fontMetric) {
-		for (int i = 0; i < this.labelIndexList.size(); i++) {
+	private void paintData(Graphics2D g2D, FontMetrics metrics) {
+		for (int i = 0; i < labelIndexList.size(); i++) {
 			int labelIndex = labelIndexList.get(i);
-			Axis currentAxis = this.axisList.get(labelIndex);
+			Axis currentAxis = axisList.get(labelIndex);
 			Range range = model.getRanges().get(labelIndex);
 
-			this.paintValue(g2d, currentAxis, this.paddingY, 
-							fontMetric, range.getMax());	// draw top value
-			this.paintValue(g2d, currentAxis, this.paddingY + this.axisHeight, 
-							fontMetric, range.getMin());	// draw bottom value
-			double step = this.axisHeight / (this.count + 1);
+			paintValue(g2D, currentAxis, paddingY, metrics, range.getMax());	// draw top value
+			paintValue(g2D, currentAxis, paddingY + axisHeight, metrics, range.getMin());	// draw bottom value
 
-			for (int j = 0; j < this.count; j++) {
-				int y = (int) Math.round(this.paddingY + this.axisHeight - step * (j + 1));
-				paintValue(g2d, currentAxis, y, 
-							fontMetric,
-							currentAxis.getMin() + (this.paddingY + this.axisHeight - y) * currentAxis.getStep());
-				if (i < this.axisList.size() - 1) {
-					Axis nextAxis = this.findNextAxis(i + 1);
-					this.paintLines(g2d, currentAxis, nextAxis);
-				}
+			double step = axisHeight / (countValue + 1);
+
+			for (int j = 0; j < countValue; ++j) {
+				int y = (int) Math.round(paddingY + axisHeight - step * (j + 1));
+				paintValue(g2D, 
+							currentAxis, 
+							y, 
+							metrics,
+							currentAxis.getMin() + (paddingY + axisHeight - y) * currentAxis.getStep());
+			}
+			if (i < axisList.size() - 1) {
+				Axis nextAxis = findNextAxis(i + 1);
+				paintLines(g2D, currentAxis, nextAxis);
 			}
 		}
 	}
@@ -175,17 +175,17 @@ public class View extends JPanel {
 		return null;
 	}
 
-	private void paintValue(Graphics2D g2d, Axis axis, int y, FontMetrics fontMetric, double value) {
+	private void paintValue(Graphics2D g2D, Axis axis, int y, FontMetrics metrics, double value) {
 		int axisX = (int) Math.round(axis.getX() + axis.getTranslate());
-		g2d.drawLine(axisX - this.length, y, axisX, y);
+		g2D.drawLine(axisX - lengthValue, y, axisX, y);
 		String label = String.format("%.1f", value);
-		int x = axisX - (fontMetric.stringWidth(label) + this.padding);
-		g2d.setColor(Color.ORANGE);
-		g2d.drawString(label, x, y);
-		g2d.setColor(Color.BLACK);
+		int x = axisX - (metrics.stringWidth(label) + paddingValue);
+		g2D.setColor(Color.ORANGE);
+		g2D.drawString(label, x, y);
+		g2D.setColor(Color.BLACK);
 	}
 
-	private void paintLines(Graphics2D g2d, Axis currentAxis, Axis nextAxis) {
+	private void paintLines(Graphics2D g2D, Axis currentAxis, Axis nextAxis) {
 		for (int index = 0; index < model.getList().size(); index++) {
 			Data data = model.getList().get(index);
 			int startX = (int) Math.round(currentAxis.getX() + currentAxis.getTranslate());
@@ -196,13 +196,12 @@ public class View extends JPanel {
 					- (data.getValue(nextAxis.getLabelIndex()) - nextAxis.getMin()) / nextAxis.getStep());
 
 			if (data.getSelected()) {
-				g2d.setColor(Color.RED);
+				g2D.setColor(Color.MAGENTA);
 			} else {
-				g2d.setColor(Color.BLACK);
+				g2D.setColor(Color.BLACK);
 			}
-
-			g2d.drawLine(startX, startY, endX, endY);
-			this.updatePlotLineList(data, index, startX, endX, startY, endY);
+			g2D.drawLine(startX, startY, endX, endY);
+			updatePlotLineList(data, index, startX, endX, startY, endY);
 		}
 	}
 
@@ -216,30 +215,29 @@ public class View extends JPanel {
 			line = plotLineList.get(index);
 		}
 
-		line.getXCoordinates().add(startX);
-		line.getXCoordinates().add(endX);
-		line.getXCoordinates().add(startY);
-		line.getXCoordinates().add(endY);
+		line.getxCoordinates().add(startX);
+		line.getxCoordinates().add(endX);
+		line.getyCoordinates().add(startY);
+		line.getyCoordinates().add(endY);
 	}
 
-	private void drawMarker(Graphics2D g2d) {
-		g2d.setPaint(Color.RED);
-		g2d.draw(this.markerRect);
+	private void drawMarker(Graphics2D g2D) {
+		g2D.setPaint(Color.RED);
+		g2D.draw(markerRectangle);
 	}
 
-	private void updateLabelIndexs() {
+	private void updateLabelIndexList() {
 		ArrayList<Axis> tempArray = new ArrayList<Axis>();
-		tempArray.addAll(this.axisList);
+		tempArray.addAll(axisList);
 		tempArray.sort(new Comparator<Axis>() {
-
 			@Override
 			public int compare(Axis o1, Axis o2) {
-				return (int) Math.round(o1.getX() + o1.getTranslate() - o2.getX() - o2.getTranslate());
+				return (int) Math.round(o1.getX() + o1.getTranslate() - (o2.getX() + o2.getTranslate()));
 			}
 		});
-		this.labelIndexList.clear();
-		for (Axis axis: tempArray) {
-			this.labelIndexList.add(axis.getLabelIndex());
+		labelIndexList.clear();
+		for (Axis axis : tempArray) {
+			labelIndexList.add(axis.getLabelIndex());
 		}
 	}
 }

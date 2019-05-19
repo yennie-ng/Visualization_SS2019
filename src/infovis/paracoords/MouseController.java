@@ -16,7 +16,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	private double startX = 0;
 	private double startY = 0;
 	private Axis selectedAxis = null;
-	
+
 	public void mouseClicked(MouseEvent e) { }
 
 	public void mouseEntered(MouseEvent e) { }
@@ -24,35 +24,34 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	public void mouseExited(MouseEvent e) { }
 
 	public void mousePressed(MouseEvent e) {
-		this.startX = e.getX();
+		startX = e.getX();
 		int y = e.getY();
-		
-		for (int i = 0; i < view.getAxisList().size(); i++) {
+
+		for (int i = 0; i < view.getAxisList().size(); ++i) {
 			Axis container = view.getAxisList().get(i);
 			if (container.getRect().contains(new Point2D.Double(startX, y))) {
-				this.selectedAxis = container;
+				selectedAxis = container;
 				break;
 			}
 		}
-		if (this.selectedAxis == null) {
-			this.startY = y;
+		if (selectedAxis == null) {
+			startY = y;
 			view.getMarkerRectangle().setRect(startX, startY, 0, 0);
-			for (Data data : this.model.getList()) {
+			for (Data data : model.getList()) {		// clear selected
 				data.setSelected(false);
 			}
 		}
 	}
 
-	public void mouseReleased(MouseEvent e) {
-		if (this.selectedAxis == null) {
+	public void mouseReleased(MouseEvent arg0) {
+		if (selectedAxis == null) {
 			for (PlotLine line : view.getPlotLineList()) {
-				for (int index = 0; index < line.getXCoordinates().size() - 1; index++) {
-					int startX = line.getXCoordinates().get(index);
-					int endX = line.getXCoordinates().get(index + 1);
-					int startY = line.getYCoordinates().get(index);
-					int endY = line.getYCoordinates().get(index + 1);
+				for (int i = 0; i < line.getxCoordinates().size() - 1; ++i) {
+					int startX = line.getxCoordinates().get(i);
+					int endX = line.getxCoordinates().get(i + 1);
+					int startY = line.getyCoordinates().get(i);
+					int endY = line.getyCoordinates().get(i + 1);
 					Line2D line2D = new Line2D.Double(startX, startY, endX, endY);
-
 					if (line2D.intersects(view.getMarkerRectangle())) {
 						line.getData().setSelected(true);
 						break;
@@ -61,9 +60,9 @@ public class MouseController implements MouseListener, MouseMotionListener {
 			}
 			view.getMarkerRectangle().setRect(0, 0, 0, 0);
 		}
-		this.selectedAxis = null;
-		this.startX = 0;
-		this.startY = 0;
+		selectedAxis = null;
+		startX = 0;
+		startY = 0;
 		view.repaint();
 	}
 
@@ -72,30 +71,31 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int y = e.getY();
 
 		if (selectedAxis != null) {
-			this.updateAxis(x);
+			updateAxis(x);
 		} else {
-			this.updateMarker(x, y);
+			updateMarker(x, y);
 		}
 		view.repaint();
 	}
 
 	private void updateAxis(int x) {
-		double translation = x - this.startX;
-		this.startX = x;
-		this.selectedAxis.setTranslate(this.selectedAxis.getTranslate() + translation);
+		double translation = x - startX;
+		startX = x;
+		selectedAxis.setTranslate(selectedAxis.getTranslate() + translation);
 	}
 
 	private void updateMarker(int x, int y) {
 		Rectangle2D marker = view.getMarkerRectangle();
-		double markerX = this.startX;
-		double markerY = this.startY;
-		double width = Math.abs(x - this.startX);
-		double height = Math.abs(y - this.startY);
-		
-		if (x < this.startX) {
+		double markerX = startX;
+		double markerY = startY;
+		double width = Math.abs(x - startX);
+		double height = Math.abs(y - startY);
+
+		if (x < startX) {
 			markerX = x;
 		}
-		if (y < this.startY) {
+
+		if (y < startY) {
 			markerY = y;
 		}
 		marker.setRect(markerX, markerY, width, height);
@@ -118,5 +118,4 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	public void setModel(Model model) {
 		this.model = model;
 	}
-
 }
